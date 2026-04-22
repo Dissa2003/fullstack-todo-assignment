@@ -2,32 +2,31 @@ const express = require('express');
 const router = express.Router();
 const Todo = require('../models/Todo');
 
-// 1. GET ALL TODOS
+// 1. GET ALL: ඔක්කොම tasks ගන්න
 router.get('/', async (req, res) => {
     try {
-        const todos = await Todo.find().sort({ createdAt: -1 }); 
+        const todos = await Todo.find().sort({ createdAt: -1 });
         res.json(todos);
     } catch (err) {
-        res.status(500).json({ message: "Server error occurred", error: err.message });
+        res.status(500).json({ message: err.message });
     }
 });
 
-// 2. CREATE A TODO
+// 2. POST: අලුත් task එකක් හදන්න
 router.post('/', async (req, res) => {
-    const { title, description } = req.body;
-    if (!title) {
-        return res.status(400).json({ message: "Title is required" });
-    }
+    const todo = new Todo({
+        title: req.body.title,
+        description: req.body.description
+    });
     try {
-        const newTodo = new Todo({ title, description, done: false });
-        const savedTodo = await newTodo.save(); // Persist in MongoDB [cite: 50]
-        res.status(201).json(savedTodo);
+        const newTodo = await todo.save();
+        res.status(201).json(newTodo);
     } catch (err) {
-        res.status(400).json({ message: "Error saving TODO", error: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 
-// 3. EDIT A TODO (Title/Description)
+// 3. PUT: Title සහ Description update කරන්න
 router.put('/:id', async (req, res) => {
     const { title, description } = req.body;
     if (!title) {
@@ -42,31 +41,32 @@ router.put('/:id', async (req, res) => {
         if (!updatedTodo) return res.status(404).json({ message: "Todo not found" });
         res.json(updatedTodo);
     } catch (err) {
-        res.status(400).json({ message: "Update failed", error: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 
-// 4. MARK AS DONE (Toggle status)
+// 4. PATCH: Task එක done ද නැද්ද කියලා toggle කරන්න
 router.patch('/:id/done', async (req, res) => {
     try {
         const todo = await Todo.findById(req.params.id);
-        if (!todo) return res.status(404).json({ message: "Todo not found" });
-        todo.done = !todo.done; 
+        if (!todo) return res.status(404).json({ message: "Not found" });
+        
+        todo.done = !todo.done;
         await todo.save();
         res.json(todo);
     } catch (err) {
-        res.status(400).json({ message: "Toggle failed", error: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 
-// 5. DELETE A TODO
+// 4. DELETE: Task එකක් අයින් කරන්න
 router.delete('/:id', async (req, res) => {
     try {
         const deleted = await Todo.findByIdAndDelete(req.params.id);
         if (!deleted) return res.status(404).json({ message: "Todo not found" });
-        res.status(200).json({ message: "TODO deleted successfully" });
+        res.json({ message: "Deleted successfully" });
     } catch (err) {
-        res.status(400).json({ message: "Delete failed", error: err.message });
+        res.status(500).json({ message: err.message });
     }
 });
 
