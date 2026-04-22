@@ -1,16 +1,87 @@
-# React + Vite
+# Frontend — Todo App (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React frontend for the fullstack Todo application. Communicates with the Express/MongoDB backend via REST API.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** — UI library
+- **Vite** — dev server and bundler
+- **Axios** — HTTP client for API calls
+- **Lucide React** — icon library
 
-## React Compiler
+## Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+src/
+├── api/
+│   └── todoApi.js        # All axios API calls
+├── components/
+│   ├── TodoForm.jsx       # Add new todo (title + optional description)
+│   ├── TodoItem.jsx       # Single todo row with inline edit, toggle, delete
+│   └── TodoList.jsx       # Filter tabs (All/Active/Done) + todo list
+├── hooks/
+│   └── useTodos.js        # State management and API integration
+├── App.jsx
+├── App.css
+├── index.css
+└── main.jsx
+```
 
-## Expanding the ESLint configuration
+## Setup & Running
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js 18+
+- The backend server must be running on `http://localhost:5000` (see `../server/README.md`)
+
+### Install dependencies
+
+```bash
+cd client
+npm install
+```
+
+### Start development server
+
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`.
+
+### Build for production
+
+```bash
+npm run build
+```
+
+Output is in `client/dist/`.
+
+### Run from root (both frontend + backend together)
+
+```bash
+# from the project root
+npm run dev
+```
+
+This uses `concurrently` to start both servers at once.
+
+## Features
+
+- Add todos with a title and optional description
+- Inline editing — click the pencil icon to edit in place
+- Toggle done/undone per task
+- Delete tasks
+- Filter by **All**, **Active**, or **Done**
+- Live task counter
+- Relative timestamps (`2m ago`, `1h ago`)
+- Dark mode support (follows system preference)
+
+## Assumptions & Limitations
+
+- The API base URL is hardcoded to `http://localhost:5000/api/todos` in `src/api/todoApi.js`. For production, this should be set via an environment variable (e.g., `VITE_API_URL`).
+- No authentication — all todos are shared/public.
+- No pagination — all todos are loaded at once. Performance may degrade with very large datasets.
+- No offline support or optimistic UI updates — every action re-fetches from the server.
+- Tested on modern browsers (Chrome, Firefox, Edge). IE is not supported.
+
