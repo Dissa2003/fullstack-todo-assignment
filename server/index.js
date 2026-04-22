@@ -7,14 +7,14 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // JSON data handle කිරීමට අත්‍යවශ්‍යයි
+app.use(express.json()); 
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch((err) => console.error('Could not connect to MongoDB', err));
 
-// Routes - මෙතැනදී api/todos path එකට route file එක connect කරනවා
+// Routes
 app.use('/api/todos', require('./routes/todoRoutes'));
 
 // Basic Health Check Route

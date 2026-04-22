@@ -12,10 +12,10 @@ const TodoSchema = new mongoose.Schema({
   },
   done: {
     type: Boolean,
-    default: false 
+    default: false // Default done status is false [cite: 38]
   }
 }, { 
-  timestamps: true 
+  timestamps: true // Creates createdAt and updatedAt automatically [cite: 39, 40]
 });
 
 module.exports = mongoose.model('Todo', TodoSchema);
