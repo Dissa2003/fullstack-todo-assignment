@@ -6,8 +6,22 @@ const TodoItem = ({ todo, onToggle, onDelete, onUpdate }) => {
   const [editTitle, setEditTitle] = useState(todo.title);
   const [editDesc, setEditDesc] = useState(todo.description || '');
 
+  const [editError, setEditError] = useState('');
+
   const handleSave = () => {
-    if (!editTitle.trim()) return;
+    if (!editTitle.trim()) {
+      setEditError('Title is required.');
+      return;
+    }
+    if (editTitle.trim().length < 2) {
+      setEditError('Title must be at least 2 characters.');
+      return;
+    }
+    if (editTitle.length > 100) {
+      setEditError('Title cannot exceed 100 characters.');
+      return;
+    }
+    setEditError('');
     onUpdate(todo._id, { title: editTitle.trim(), description: editDesc.trim() });
     setEditing(false);
   };
@@ -37,13 +51,18 @@ const TodoItem = ({ todo, onToggle, onDelete, onUpdate }) => {
     return (
       <div className="todo-item editing">
         <input
-          className="edit-input"
+          className={`edit-input ${editError ? 'input-error' : ''}`}
           value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
+          onChange={(e) => { setEditTitle(e.target.value); if (editError) setEditError(''); }}
           onKeyDown={handleKeyDown}
           autoFocus
-          maxLength={100}
+          maxLength={101}
+          aria-invalid={!!editError}
+          aria-describedby="edit-title-error"
         />
+        {editError && (
+          <p className="field-error" id="edit-title-error" role="alert">{editError}</p>
+        )}
         <textarea
           className="edit-textarea"
           value={editDesc}
@@ -54,12 +73,17 @@ const TodoItem = ({ todo, onToggle, onDelete, onUpdate }) => {
           maxLength={300}
         />
         <div className="edit-actions">
-          <button className="save-btn" onClick={handleSave} title="Save">
-            <Check size={16} /> Save
-          </button>
-          <button className="cancel-btn" onClick={handleCancel} title="Cancel">
-            <X size={16} /> Cancel
-          </button>
+          <span className={`char-count ${editTitle.length > 80 ? 'warn' : ''}`}>
+            {editTitle.length}/100
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="save-btn" onClick={handleSave} title="Save">
+              <Check size={16} /> Save
+            </button>
+            <button className="cancel-btn" onClick={handleCancel} title="Cancel">
+              <X size={16} /> Cancel
+            </button>
+          </div>
         </div>
       </div>
     );
