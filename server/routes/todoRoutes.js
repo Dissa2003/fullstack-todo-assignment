@@ -29,12 +29,17 @@ router.post('/', async (req, res) => {
 
 // 3. EDIT A TODO (Title/Description)
 router.put('/:id', async (req, res) => {
+    const { title, description } = req.body;
+    if (!title) {
+        return res.status(400).json({ message: "Title is required" });
+    }
     try {
         const updatedTodo = await Todo.findByIdAndUpdate(
-            req.params.id, 
-            { $set: req.body }, 
-            { new: true }
+            req.params.id,
+            { $set: { title, description } },
+            { new: true, runValidators: true }
         );
+        if (!updatedTodo) return res.status(404).json({ message: "Todo not found" });
         res.json(updatedTodo);
     } catch (err) {
         res.status(400).json({ message: "Update failed", error: err.message });
@@ -57,8 +62,9 @@ router.patch('/:id/done', async (req, res) => {
 // 5. DELETE A TODO
 router.delete('/:id', async (req, res) => {
     try {
-        await Todo.findByIdAndDelete(req.params.id);
-        res.json({ message: "TODO deleted successfully" });
+        const deleted = await Todo.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ message: "Todo not found" });
+        res.status(200).json({ message: "TODO deleted successfully" });
     } catch (err) {
         res.status(400).json({ message: "Delete failed", error: err.message });
     }
