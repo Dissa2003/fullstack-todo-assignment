@@ -27,6 +27,13 @@ export const useTodos = () => {
     } catch (err) { console.error("Add Error:", err); }
   };
 
+  const updateTodo = async (id, data) => {
+    try {
+      await api.updateTodo(id, data);
+      fetchTodos();
+    } catch (err) { console.error("Update Error:", err); }
+  };
+
   const removeTodo = async (id) => {
     try {
       await api.deleteTodo(id);
@@ -41,5 +48,5 @@ export const useTodos = () => {
     } catch (err) { console.error("Toggle Error:", err); }
   };
 
-  return { todos, loading, addTodo, removeTodo, toggleDone };
+  return { todos, loading, addTodo, updateTodo, removeTodo, toggleDone };
 };
